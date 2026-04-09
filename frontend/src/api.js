@@ -481,11 +481,17 @@ export const api = {
     getFeaturedVideo: async () => apiClient.get('/admin/featured-video').then(r => r.data),
     updateFeaturedVideo: async (data) => apiClient.put('/admin/featured-video', data).then(r => r.data),
 
-    // Daily Quotes
+    // Daily Quotes (legacy single-language rows)
     getDailyQuotes: async () => apiClient.get('/admin/daily-quotes').then(r => r.data),
     createDailyQuote: async (data) => apiClient.post('/admin/daily-quotes', data).then(r => r.data),
     updateDailyQuote: async (id, data) => apiClient.put(`/admin/daily-quotes/${id}`, data).then(r => r.data),
     deleteDailyQuote: async (id) => apiClient.delete(`/admin/daily-quotes/${id}`).then(r => r.data),
+
+    // Daily quote groups (EN + MR + HI per slideshow slide)
+    getDailyQuoteGroups: async () => apiClient.get('/admin/daily-quote-groups').then(r => r.data),
+    createDailyQuoteGroup: async (data) => apiClient.post('/admin/daily-quote-groups', data).then(r => r.data),
+    updateDailyQuoteGroup: async (id, data) => apiClient.put(`/admin/daily-quote-groups/${id}`, data).then(r => r.data),
+    deleteDailyQuoteGroup: async (id) => apiClient.delete(`/admin/daily-quote-groups/${id}`).then(r => r.data),
 
     // Government Schemes
     getGovernmentSchemes: async () => apiClient.get('/admin/government-schemes').then(r => r.data),
@@ -647,6 +653,8 @@ export const getPlacementStories = () => apiClient.get('/placement-stories').the
 export const getFeaturedVideo = () => apiClient.get('/featured-video').then(r => r.data);
 export const getDailyQuote = (language = null) =>
   apiClient.get('/daily-quote', { params: language ? { language } : {} }).then((r) => r.data);
+
+export const getDailyQuoteGroups = () => apiClient.get('/daily-quote-groups').then((r) => r.data);
 export const getGovernmentSchemes = () => apiClient.get('/government-schemes').then(r => r.data);
 export const getFundsUtilization = () => apiClient.get('/funds-utilization').then(r => r.data);
 export const getYouthCourses = () => apiClient.get('/youth-courses').then(r => r.data);
