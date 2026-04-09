@@ -1913,14 +1913,86 @@ async def update_featured_video(data: FeaturedVideoUpdate, current_user: dict = 
         raise HTTPException(status_code=500, detail="Failed to update featured video")
 
 
-# ---- Daily Quote ----
+# ---- Daily Quote (trilingual groups + legacy single-language rows) ----
+def _strip_quote_field(v):
+    if v is None:
+        return None
+    s = str(v).strip()
+    return s if s else None
+
+
+def _resolve_quote_group(group: dict, language: Optional[str] = None):
+    """Pick quote/author for language with fallback en → mr → hi."""
+    lang = (language or "en").strip().lower()[:12] or "en"
+    if lang not in ("en", "mr", "hi"):
+        lang = "en"
+    q_en = _strip_quote_field(group.get("quote_en"))
+    q_mr = _strip_quote_field(group.get("quote_mr"))
+    q_hi = _strip_quote_field(group.get("quote_hi"))
+    a_en = _strip_quote_field(group.get("author_en"))
+    a_mr = _strip_quote_field(group.get("author_mr"))
+    a_hi = _strip_quote_field(group.get("author_hi"))
+    q_map = {"en": q_en, "mr": q_mr, "hi": q_hi}
+    a_map = {"en": a_en, "mr": a_mr, "hi": a_hi}
+    quote = q_map.get(lang) or q_en or q_mr or q_hi
+    author = a_map.get(lang) or a_en or a_mr or a_hi
+    return quote, author
+
+
+@api_router.get("/daily-quote-groups")
+async def get_daily_quote_groups():
+    """Active quote groups for homepage slideshow (EN/MR/HI per group)."""
+    try:
+        items = await db.daily_quote_groups.find({"is_active": True}, sort=[("order", 1), ("created_at", -1)]).to_list(
+            length=None
+        )
+        groups = []
+        for g in items:
+            qe, qm, qh = _strip_quote_field(g.get("quote_en")), _strip_quote_field(g.get("quote_mr")), _strip_quote_field(
+                g.get("quote_hi")
+            )
+            if not (qe or qm or qh):
+                continue
+            groups.append(
+                {
+                    "id": g.get("id"),
+                    "quote_en": qe,
+                    "quote_mr": qm,
+                    "quote_hi": qh,
+                    "author_en": _strip_quote_field(g.get("author_en")),
+                    "author_mr": _strip_quote_field(g.get("author_mr")),
+                    "author_hi": _strip_quote_field(g.get("author_hi")),
+                    "image_url": g.get("image_url"),
+                    "order": g.get("order", 0),
+                }
+            )
+        return {"groups": groups, "rotate_interval_seconds": 8}
+    except Exception as e:
+        logger.error(f"Failed to fetch daily quote groups: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch daily quote groups")
+
+
 @api_router.get("/daily-quote")
 async def get_daily_quote(language: Optional[str] = None):
-    """Today's quote, optionally filtered by language (en, mr, hi, …); falls back across languages."""
+    """Single quote for Impact hero etc.: first active group in selected language, else legacy daily_quotes."""
     try:
         from datetime import date
-        today = date.today().isoformat()
+
         lang = (language or "en").strip().lower()[:12] or "en"
+        groups = await db.daily_quote_groups.find({"is_active": True}, sort=[("order", 1), ("created_at", -1)]).to_list(
+            length=None
+        )
+        for g in groups:
+            quote, author = _resolve_quote_group(g, lang)
+            if quote:
+                return {
+                    "id": g.get("id"),
+                    "quote": quote,
+                    "author": author,
+                    "image_url": g.get("image_url"),
+                }
+
+        today = date.today().isoformat()
 
         async def pick_for_today(lg: Optional[str] = None):
             q = {"quote_date": today, "is_active": True}
@@ -1936,7 +2008,9 @@ async def get_daily_quote(language: Optional[str] = None):
             lst = await db.daily_quotes.find(q2, sort=[("quote_date", -1), ("order", 1)]).limit(1).to_list(length=1)
             doc = lst[0] if lst else None
         if not doc:
-            lst = await db.daily_quotes.find({"is_active": True}, sort=[("quote_date", -1), ("order", 1)]).limit(1).to_list(length=1)
+            lst = await db.daily_quotes.find({"is_active": True}, sort=[("quote_date", -1), ("order", 1)]).limit(1).to_list(
+                length=1
+            )
             doc = lst[0] if lst else None
         if not doc:
             return None
@@ -1997,6 +2071,96 @@ async def delete_daily_quote(qid: str, current_user: dict = Depends(admin_requir
     except Exception as e:
         logger.error(f"Failed to delete daily quote: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete daily quote")
+
+
+def _normalize_daily_quote_group_payload(data: dict) -> dict:
+    out = dict(data)
+    for k in ("quote_en", "quote_mr", "quote_hi", "author_en", "author_mr", "author_hi", "image_url"):
+        if k in out and out[k] is not None:
+            out[k] = _strip_quote_field(out[k])
+    return out
+
+
+@api_router.get("/admin/daily-quote-groups")
+async def get_admin_daily_quote_groups(current_user: dict = Depends(admin_required)):
+    try:
+        items = await db.daily_quote_groups.find({}, sort=[("order", 1), ("created_at", -1)]).to_list(length=None)
+        for x in items:
+            x["_id"] = str(x["_id"])
+        return {"groups": items}
+    except Exception as e:
+        logger.error(f"Failed to fetch daily quote groups: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch daily quote groups")
+
+
+@api_router.post("/admin/daily-quote-groups", response_model=MessageResponse)
+async def create_daily_quote_group(data: DailyQuoteGroupCreate, current_user: dict = Depends(admin_required)):
+    try:
+        d = _normalize_daily_quote_group_payload(data.dict())
+        if not any([d.get("quote_en"), d.get("quote_mr"), d.get("quote_hi")]):
+            raise HTTPException(
+                status_code=400, detail="Add at least one language: English, Marathi, or Hindi quote text."
+            )
+        d["id"] = str(uuid.uuid4())
+        d["created_at"] = datetime.utcnow()
+        d["updated_at"] = datetime.utcnow()
+        await db.daily_quote_groups.insert_one(d)
+        return MessageResponse(message="Quote group created successfully!")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to create daily quote group: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create daily quote group")
+
+
+@api_router.put("/admin/daily-quote-groups/{gid}", response_model=MessageResponse)
+async def update_daily_quote_group(gid: str, data: DailyQuoteGroupUpdate, current_user: dict = Depends(admin_required)):
+    try:
+        patch = {k: v for k, v in data.model_dump(exclude_unset=True).items() if v is not None}
+        # Do not overwrite existing EN/MR/HI text with blank strings (admin form sends all fields; empty means "unchanged")
+        _lang_fields = {"quote_en", "quote_mr", "quote_hi", "author_en", "author_mr", "author_hi"}
+        for key in list(patch.keys()):
+            if key in _lang_fields and isinstance(patch[key], str) and _strip_quote_field(patch[key]) == "":
+                del patch[key]
+        patch = _normalize_daily_quote_group_payload(patch)
+        patch["updated_at"] = datetime.utcnow()
+        existing = await db.daily_quote_groups.find_one({"id": gid})
+        if not existing:
+            raise HTTPException(status_code=404, detail="Quote group not found")
+        merged = {**existing, **patch}
+        if not any(
+            [
+                _strip_quote_field(merged.get("quote_en")),
+                _strip_quote_field(merged.get("quote_mr")),
+                _strip_quote_field(merged.get("quote_hi")),
+            ]
+        ):
+            raise HTTPException(
+                status_code=400, detail="At least one language quote (EN / MR / HI) must remain after update."
+            )
+        r = await db.daily_quote_groups.update_one({"id": gid}, {"$set": patch})
+        if r.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Quote group not found")
+        return MessageResponse(message="Quote group updated successfully!")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to update daily quote group: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update daily quote group")
+
+
+@api_router.delete("/admin/daily-quote-groups/{gid}", response_model=MessageResponse)
+async def delete_daily_quote_group(gid: str, current_user: dict = Depends(admin_required)):
+    try:
+        r = await db.daily_quote_groups.delete_one({"id": gid})
+        if r.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Quote group not found")
+        return MessageResponse(message="Quote group deleted successfully!")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to delete daily quote group: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete daily quote group")
 
 
 # ---- Government Schemes ----
@@ -2485,7 +2649,8 @@ async def get_admin_management_messages(current_user: dict = Depends(admin_requi
 @api_router.post("/admin/management-messages", response_model=MessageResponse)
 async def create_management_message(data: ManagementMessageCreate, current_user: dict = Depends(admin_required)):
     try:
-        d = data.dict()
+        d = data.model_dump()
+        d["leadership_member_id"] = d.get("leadership_member_id") or None
         d["id"] = str(uuid.uuid4())
         d["created_at"] = datetime.utcnow()
         d["updated_at"] = datetime.utcnow()
@@ -2498,7 +2663,13 @@ async def create_management_message(data: ManagementMessageCreate, current_user:
 @api_router.put("/admin/management-messages/{mid}", response_model=MessageResponse)
 async def update_management_message(mid: str, data: ManagementMessageUpdate, current_user: dict = Depends(admin_required)):
     try:
-        update_dict = {k: v for k, v in data.dict().items() if v is not None}
+        raw = data.model_dump(exclude_unset=True)
+        update_dict = {}
+        for k, v in raw.items():
+            if k == "leadership_member_id":
+                update_dict[k] = v or None
+            elif v is not None:
+                update_dict[k] = v
         update_dict["updated_at"] = datetime.utcnow()
         r = await db.management_messages.update_one({"id": mid}, {"$set": update_dict})
         if r.matched_count == 0:

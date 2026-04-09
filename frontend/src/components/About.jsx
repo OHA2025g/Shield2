@@ -1,14 +1,49 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from './ui/carousel';
 import { Heart, Users, Award, Target, Eye, Star, CheckCircle, Calendar, Building } from 'lucide-react';
-import { api, getPublicSiteContent, getLeadershipTeam, getDetailedPageSections } from '../api';
+import { api, getPublicSiteContent, getLeadershipTeam, getDetailedPageSections, getManagementMessages } from '../api';
 import Header from './Header';
 import Footer from './Footer';
 import FundsTransparencySection from './FundsTransparencySection';
 
+function normPersonName(s) {
+  if (!s) return '';
+  return s
+    .toLowerCase()
+    .replace(/\b(mr|mrs|ms|miss|dr|prof)\.?\s+/gi, '')
+    .replace(/\./g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Match CMS management message to a leadership team member (by linked id, then by author name). */
+function findManagementMessageForMember(member, messages) {
+  if (!messages?.length) return null;
+  const mid = member.id || member._id;
+  if (mid) {
+    const byId = messages.find((m) => m.leadership_member_id && m.leadership_member_id === mid);
+    if (byId) return byId;
+  }
+  const mn = normPersonName(member.name);
+  if (!mn) return null;
+  const byExact = messages.find((m) => normPersonName(m.author_name || '') === mn);
+  if (byExact) return byExact;
+  return (
+    messages.find(
+      (m) =>
+        normPersonName(m.author_name || '').length >= 4 &&
+        (mn.includes(normPersonName(m.author_name || '')) ||
+          normPersonName(m.author_name || '').includes(mn))
+    ) || null
+  );
+}
+
 const About = () => {
+  const location = useLocation();
   // Site content state
   const [siteContent, setSiteContent] = useState({});
   // Leadership team state
@@ -17,6 +52,7 @@ const About = () => {
   const [impactStats, setImpactStats] = useState({});
   // Detailed page sections state
   const [pageSections, setPageSections] = useState([]);
+  const [managementMessages, setManagementMessages] = useState([]);
 
   // Load site content and leadership team on component mount
   useEffect(() => {
@@ -76,6 +112,13 @@ const About = () => {
         } catch (sectionsError) {
           console.log('Using empty page sections');
         }
+
+        try {
+          const msgData = await getManagementMessages();
+          setManagementMessages(msgData.messages || []);
+        } catch {
+          setManagementMessages([]);
+        }
       } catch (error) {
         console.log('Using fallback data for site content and leadership team');
         setSiteContent({});
@@ -100,11 +143,26 @@ const About = () => {
             description: "Expert in vocational training with focus on youth skill development and employment placement."
           }
         ]);
+        try {
+          const msgData = await getManagementMessages();
+          setManagementMessages(msgData.messages || []);
+        } catch {
+          setManagementMessages([]);
+        }
       }
     };
     
     loadData();
   }, []);
+
+  useEffect(() => {
+    const raw = (location.hash || '').replace(/^#/, '');
+    if (!raw) return undefined;
+    const t = setTimeout(() => {
+      document.getElementById(raw)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+    return () => clearTimeout(t);
+  }, [location.hash, managementMessages]);
 
   const values = [
     {
@@ -300,27 +358,36 @@ const About = () => {
                     {categoryDisplayNames[categoryKey]}
                   </h3>
                   <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {members.map((member, index) => (
-                      <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
-                        <CardContent className="p-8">
-                          <img
-                            src={member.image}
-                            alt={member.name}
-                            className="w-32 h-32 rounded-full mx-auto mb-6 object-cover"
-                            onError={(e) => {
-                              e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face";
-                            }}
-                          />
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">{member.name}</h3>
-                          <Badge className="mb-4 bg-yellow-400 text-black hover:bg-yellow-500">
-                            {member.role}
-                          </Badge>
-                          {member.description && (
-                            <p className="text-gray-600 text-sm leading-relaxed">{member.description}</p>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
+                    {members.map((member, index) => {
+                      const linkedMessage = findManagementMessageForMember(member, managementMessages);
+                      const memberKey = member.id || member._id || `${categoryKey}-${index}`;
+                      return (
+                        <Card key={memberKey} className="text-center hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                          <CardContent className="flex flex-col p-8 flex-1">
+                            <img
+                              src={member.image}
+                              alt={member.name}
+                              className="w-32 h-32 rounded-full mx-auto mb-6 object-cover"
+                              onError={(e) => {
+                                e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face";
+                              }}
+                            />
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">{member.name}</h3>
+                            <Badge className="mb-4 bg-yellow-400 text-black hover:bg-yellow-500 mx-auto">
+                              {member.role}
+                            </Badge>
+                            {member.description && (
+                              <p className="text-gray-600 text-sm leading-relaxed flex-1">{member.description}</p>
+                            )}
+                            {linkedMessage && (
+                              <Button asChild variant="outline" size="sm" className="mt-4 w-full shrink-0 text-xs sm:text-sm">
+                                <Link to={`/about#leader-msg-${linkedMessage.id}`}>Read their message</Link>
+                              </Button>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -336,6 +403,36 @@ const About = () => {
         </div>
       </section>
 
+      {managementMessages.length > 0 && (
+        <section className="py-16 bg-slate-50 border-t border-slate-200" aria-labelledby="leadership-messages-heading">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 id="leadership-messages-heading" className="text-3xl font-bold text-gray-900 mb-3 text-center">
+              Messages from leadership
+            </h2>
+            <p className="text-center text-gray-600 text-sm max-w-2xl mx-auto mb-10">
+              Reflections from our team. From a profile above, use &quot;Read their message&quot; to jump to the right note.
+            </p>
+            <div className="space-y-8 max-w-3xl mx-auto">
+              {managementMessages.map((m) => (
+                <article
+                  key={m.id}
+                  id={`leader-msg-${m.id}`}
+                  className="scroll-mt-28 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+                >
+                  {m.title && <h3 className="text-xl font-semibold text-gray-900 mb-2">{m.title}</h3>}
+                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{m.message}</p>
+                  {(m.author_name || m.author_role) && (
+                    <footer className="mt-4 pt-4 border-t border-slate-100">
+                      {m.author_name && <p className="font-medium text-gray-900 text-sm">{m.author_name}</p>}
+                      {m.author_role && <p className="text-xs text-blue-700">{m.author_role}</p>}
+                    </footer>
+                  )}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Dynamic Page Sections */}
       {pageSections.length > 0 && (

@@ -650,6 +650,31 @@ class DailyQuoteUpdate(BaseModel):
     order: Optional[int] = None
 
 
+# Daily quote groups: one slideshow entry with EN / MR / HI text (and optional per-language authors)
+class DailyQuoteGroupCreate(BaseModel):
+    quote_en: Optional[str] = None
+    quote_mr: Optional[str] = None
+    quote_hi: Optional[str] = None
+    author_en: Optional[str] = None
+    author_mr: Optional[str] = None
+    author_hi: Optional[str] = None
+    image_url: Optional[str] = None
+    order: int = 0
+    is_active: bool = True
+
+
+class DailyQuoteGroupUpdate(BaseModel):
+    quote_en: Optional[str] = None
+    quote_mr: Optional[str] = None
+    quote_hi: Optional[str] = None
+    author_en: Optional[str] = None
+    author_mr: Optional[str] = None
+    author_hi: Optional[str] = None
+    image_url: Optional[str] = None
+    order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
 # Government Schemes (MCED & MSSDS empanelment 2013 - students trained by project/course)
 class GovernmentSchemeRecord(BaseModel):
     id: str
@@ -884,6 +909,7 @@ class ManagementMessage(BaseModel):
     author_name: Optional[str] = None
     author_role: Optional[str] = None
     image: Optional[str] = None
+    leadership_member_id: Optional[str] = None
     order: int = 0
     is_active: bool = True
     created_at: Optional[datetime] = None
@@ -895,6 +921,7 @@ class ManagementMessageCreate(BaseModel):
     author_name: Optional[str] = None
     author_role: Optional[str] = None
     image: Optional[str] = None
+    leadership_member_id: Optional[str] = None
     order: int = 0
     is_active: bool = True
 
@@ -904,6 +931,7 @@ class ManagementMessageUpdate(BaseModel):
     author_name: Optional[str] = None
     author_role: Optional[str] = None
     image: Optional[str] = None
+    leadership_member_id: Optional[str] = None
     order: Optional[int] = None
     is_active: Optional[bool] = None
 

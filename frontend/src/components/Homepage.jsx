@@ -13,12 +13,10 @@ import Footer from './Footer';
 import TestimonialsSection from './TestimonialsSection';
 import OrgOverviewSection from './OrgOverviewSection';
 import HeroBackgroundCarousel from './HeroBackgroundCarousel';
-import MediaCarousel from './MediaCarousel';
 import SuccessStoriesByCategory from './SuccessStoriesByCategory';
-import FeaturedVideoSection from './FeaturedVideoSection';
 import EngagementSection from './EngagementSection';
 import DailyQuoteSection from './DailyQuoteSection';
-import ManagementMessagesSection from './ManagementMessagesSection';
+import HomepageSpotlightTabs from './HomepageSpotlightTabs';
 
 const Homepage = () => {
   const { toast } = useToast();
@@ -369,20 +367,11 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* Dynamic Media Gallery - Events & Programmes carousel */}
-      <MediaCarousel
-        title="Events & Programmes"
-        categoryFilter="events_programmes"
-        autoScrollInterval={6000}
-      />
+      {/* Events & Programmes + Featured Story (tabs) */}
+      <HomepageSpotlightTabs />
 
       {/* Success Stories - Senior Citizens & Youth Skill Training */}
       <SuccessStoriesByCategory />
-
-      {/* Featured Video (e.g. Daniel's home-bound patient story) */}
-      <FeaturedVideoSection />
-
-      <ManagementMessagesSection />
 
       {/* Testimonials Section */}
       <TestimonialsSection />
