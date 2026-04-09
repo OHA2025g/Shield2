@@ -212,6 +212,37 @@ const GovernmentSchemes = () => {
                 </CardContent>
               </Card>
 
+              {(page.youth_schemes_note || page.senior_schemes_note) && (
+                <div className="space-y-8">
+                  {page.youth_schemes_note?.trim() && (
+                    <Card>
+                      <CardHeader className="bg-blue-50">
+                        <CardTitle className="flex items-center text-lg md:text-xl">
+                          <GraduationCap className="h-6 w-6 mr-2 flex-shrink-0" />
+                          Government schemes for youth (Mumbai / Maharashtra)
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-6">
+                        <ProseBlock text={page.youth_schemes_note} />
+                      </CardContent>
+                    </Card>
+                  )}
+                  {page.senior_schemes_note?.trim() && (
+                    <Card>
+                      <CardHeader className="bg-amber-50">
+                        <CardTitle className="flex items-center text-lg md:text-xl">
+                          <BookOpen className="h-6 w-6 mr-2 flex-shrink-0" />
+                          Government schemes for senior citizens (Mumbai / Maharashtra)
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-6">
+                        <ProseBlock text={page.senior_schemes_note} />
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+
               {!loading && records.length === 0 && (
                 <p className="text-center text-gray-500 text-sm">
                   No tabular training data is published yet. Narrative information and official links above are still available.

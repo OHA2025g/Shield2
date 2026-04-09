@@ -944,6 +944,9 @@ class GovernmentSchemesPageMerge(BaseModel):
     programmes_note: Optional[str] = None
     eligibility_note: Optional[str] = None
     official_links: Optional[List[GovSchemeOfficialLink]] = None
+    # Narrative blocks for state / national schemes (Mumbai & Maharashtra)
+    youth_schemes_note: Optional[str] = None
+    senior_schemes_note: Optional[str] = None
 
 
 # Internal content contribution workflow (member submissions → review → approval)

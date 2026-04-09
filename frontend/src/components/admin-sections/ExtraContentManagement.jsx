@@ -429,6 +429,8 @@ const ExtraContentManagement = () => {
     mssds_intro: '',
     programmes_note: '',
     eligibility_note: '',
+    youth_schemes_note: '',
+    senior_schemes_note: '',
     links: emptyGovLinks(),
   });
 
@@ -449,6 +451,8 @@ const ExtraContentManagement = () => {
           mssds_intro: gs.mssds_intro || '',
           programmes_note: gs.programmes_note || '',
           eligibility_note: gs.eligibility_note || '',
+          youth_schemes_note: gs.youth_schemes_note || '',
+          senior_schemes_note: gs.senior_schemes_note || '',
           links: padded.length ? padded : emptyGovLinks(),
         });
       })
@@ -466,6 +470,8 @@ const ExtraContentManagement = () => {
         mssds_intro: govPageForm.mssds_intro || '',
         programmes_note: govPageForm.programmes_note || '',
         eligibility_note: govPageForm.eligibility_note || '',
+        youth_schemes_note: govPageForm.youth_schemes_note || '',
+        senior_schemes_note: govPageForm.senior_schemes_note || '',
         official_links: official_links.length ? official_links : [],
       });
       showAlert({ title: 'Government schemes page saved', variant: 'success' });
@@ -749,8 +755,8 @@ const ExtraContentManagement = () => {
             <CardHeader className="border-b border-border/60 bg-muted/20">
               <CardTitle className="text-lg">Government schemes page (public)</CardTitle>
               <CardDescription>
-                Intro text, MCED/MSSDS narratives, programme notes, and official links shown on{' '}
-                <strong>/government-schemes</strong>. Tables of trained students are still managed under &quot;Government
+                Intro text, MCED/MSSDS narratives, programme notes, youth/senior scheme narratives, and official links
+                shown on <strong>/government-schemes</strong>. MCED/MSSDS tables are managed under &quot;Government
                 Schemes&quot;.
               </CardDescription>
             </CardHeader>
@@ -798,6 +804,26 @@ const ExtraContentManagement = () => {
                   rows={3}
                   value={govPageForm.eligibility_note}
                   onChange={(e) => setGovPageForm((p) => ({ ...p, eligibility_note: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gp-youth">Youth schemes (Mumbai / Maharashtra) — long text block</Label>
+                <Textarea
+                  id="gp-youth"
+                  rows={12}
+                  value={govPageForm.youth_schemes_note}
+                  onChange={(e) => setGovPageForm((p) => ({ ...p, youth_schemes_note: e.target.value }))}
+                  placeholder="Shown in its own card on the public page…"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gp-senior">Senior citizen schemes — long text block</Label>
+                <Textarea
+                  id="gp-senior"
+                  rows={12}
+                  value={govPageForm.senior_schemes_note}
+                  onChange={(e) => setGovPageForm((p) => ({ ...p, senior_schemes_note: e.target.value }))}
+                  placeholder="Shown in its own card on the public page…"
                 />
               </div>
               <div className="space-y-3">

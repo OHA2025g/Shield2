@@ -139,6 +139,7 @@ const Gallery = () => {
     { id: 'all', name: 'All', count: galleryItems?.length || 0 },
     { id: 'youth', name: 'Youth Programs', count: galleryItems?.filter(item => item.category === 'youth').length || 0 },
     { id: 'seniors', name: 'Senior Care', count: galleryItems?.filter(item => item.category === 'seniors').length || 0 },
+    { id: 'case_study', name: 'Case studies (seniors)', count: galleryItems?.filter(item => item.category === 'case_study').length || 0 },
     { id: 'community', name: 'Community', count: galleryItems?.filter(item => item.category === 'community').length || 0 },
     { id: 'events', name: 'Events', count: galleryItems?.filter(item => item.category === 'events').length || 0 }
   ];
