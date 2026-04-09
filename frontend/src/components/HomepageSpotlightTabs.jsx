@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { CalendarDays, Sparkles } from 'lucide-react';
 import MediaCarousel from './MediaCarousel';
 import { getFeaturedVideo } from '../api';
-import { cn } from '../lib/utils';
+import { cn, looksLikeGibberishText } from '../lib/utils';
 
 /**
  * Homepage: Events & Programmes carousel and Featured Story video in one polished card.
@@ -29,11 +29,15 @@ const HomepageSpotlightTabs = () => {
   const titleIsPlaceholder =
     video?.title &&
     String(video.title).trim().length > 0 &&
-    String(video.title).trim().length < 4 &&
-    !/\s/.test(String(video.title).trim());
+    String(video.title).trim().length <= 4 &&
+    !/\s/.test(String(video.title).trim()) &&
+    /^[a-z0-9]+$/i.test(String(video.title).trim());
 
   const displayVideoTitle =
     video?.title && !titleIsPlaceholder ? video.title : embedUrl ? 'Featured story' : '';
+
+  const safeVideoDescription =
+    video?.description && !looksLikeGibberishText(video.description) ? video.description.trim() : '';
 
   return (
     <section className="py-12 sm:py-14 bg-gradient-to-b from-slate-50 via-gray-50/80 to-white border-y border-gray-100">
@@ -116,25 +120,29 @@ const HomepageSpotlightTabs = () => {
                       />
                     </div>
                     <div
-                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent"
+                      className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/70 to-transparent sm:h-28 sm:from-black/60"
                       aria-hidden
                     />
-                    <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 md:p-5 pt-12 sm:pt-16">
+                    <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-start p-3 sm:p-4">
                       <div
                         className={cn(
-                          'rounded-xl border border-white/30 px-4 py-3 shadow-lg',
-                          'bg-white/60 backdrop-blur-md supports-[backdrop-filter]:bg-white/[0.55]',
-                          'dark:border-white/20 dark:bg-white/10'
+                          'max-w-[min(100%,18rem)] sm:max-w-md',
+                          'rounded-lg border border-white/20 bg-black/50 px-3 py-2 shadow-lg',
+                          'backdrop-blur-md supports-[backdrop-filter]:bg-black/40'
                         )}
                       >
-                        <span className="mb-2 inline-block rounded-full bg-amber-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-900 shadow-sm">
+                        <span className="mb-1 inline-block rounded-full bg-amber-400 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gray-900">
                           Success story
                         </span>
                         {displayVideoTitle && (
-                          <p className="text-base font-bold leading-snug text-gray-900 sm:text-lg">{displayVideoTitle}</p>
+                          <p className="text-sm font-bold leading-snug text-white drop-shadow-sm sm:text-base">
+                            {displayVideoTitle}
+                          </p>
                         )}
-                        {video.description && (
-                          <p className="mt-1.5 text-sm leading-relaxed text-gray-700 line-clamp-3">{video.description}</p>
+                        {safeVideoDescription && (
+                          <p className="mt-1 text-xs leading-snug text-white/90 line-clamp-2 sm:text-sm">
+                            {safeVideoDescription}
+                          </p>
                         )}
                       </div>
                     </div>

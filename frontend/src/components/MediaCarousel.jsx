@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { getGalleryItems } from '../api';
 import { Button } from './ui/button';
-import { cn } from '../lib/utils';
+import { cn, looksLikeGibberishText } from '../lib/utils';
 
 const MediaCarousel = ({ categoryFilter = null, title = 'Gallery', autoScrollInterval = 5000, embedded = false }) => {
   const [items, setItems] = useState([]);
@@ -88,6 +88,7 @@ const MediaCarousel = ({ categoryFilter = null, title = 'Gallery', autoScrollInt
   const descText = item.description?.trim() || '';
   const titleLooksLikePlaceholder =
     titleText.length > 0 && titleText.length <= 4 && !/\s/.test(titleText) && /^[a-z0-9]+$/i.test(titleText);
+  const safeDesc = descText && !looksLikeGibberishText(descText) ? descText : '';
 
   const inner = (
     <>
@@ -149,26 +150,30 @@ const MediaCarousel = ({ categoryFilter = null, title = 'Gallery', autoScrollInt
             </div>
           )}
 
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" aria-hidden />
+          {/* Narrow bottom band so the image/video stays mostly unobstructed */}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/70 to-transparent sm:h-28 sm:from-black/60"
+            aria-hidden
+          />
 
-          <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 md:p-5 pt-14 sm:pt-20">
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-start p-3 sm:p-4">
             <div
               className={cn(
-                'rounded-xl border border-white/35 px-4 py-3 shadow-lg',
-                'bg-white/60 backdrop-blur-md supports-[backdrop-filter]:bg-white/[0.58]',
-                'dark:border-white/20 dark:bg-white/10'
+                'max-w-[min(100%,18rem)] sm:max-w-md',
+                'rounded-lg border border-white/20 bg-black/50 px-3 py-2 shadow-lg',
+                'backdrop-blur-md supports-[backdrop-filter]:bg-black/40'
               )}
             >
               {embedded && (
-                <span className="mb-2 inline-block rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow-sm">
+                <span className="mb-1 inline-block rounded-full bg-blue-500 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white">
                   {item.type === 'video' ? 'Video' : 'Programme'}
                 </span>
               )}
-              <h3 className="text-base font-bold leading-snug text-gray-900 sm:text-lg">
+              <h3 className="text-sm font-bold leading-snug text-white drop-shadow-sm sm:text-base">
                 {titleLooksLikePlaceholder ? 'Events & programmes' : titleText}
               </h3>
-              {descText ? (
-                <p className="mt-1.5 text-sm leading-relaxed text-gray-700 line-clamp-2">{descText}</p>
+              {safeDesc ? (
+                <p className="mt-1 text-xs leading-snug text-white/90 line-clamp-2 sm:text-sm">{safeDesc}</p>
               ) : null}
             </div>
           </div>
