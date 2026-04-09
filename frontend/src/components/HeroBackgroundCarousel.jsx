@@ -3,6 +3,9 @@ import { getGalleryItems } from '../api';
 
 const HERO_GALLERY_CATEGORY = 'homepage_hero';
 
+/** Keeps faces / upper subject area in frame when object-fit: cover crops wide banners */
+const HERO_OBJECT_POSITION = 'center 28%';
+
 // NGO-style hero images (reliable CDN; used when no admin-managed slides exist)
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1523240795612-9a1b7227348e?w=1920&h=1080&fit=crop',
@@ -71,28 +74,20 @@ const HeroBackgroundCarousel = () => {
   }, [len]);
 
   const currentIndex = len > 0 ? index % len : 0;
-  const currentSrc = displayImages[currentIndex];
 
   return (
-    <div
-      className="absolute inset-0 z-0 overflow-hidden"
-      style={{
-        backgroundImage: currentSrc ? `url(${currentSrc})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
+    <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden>
       {displayImages.map((src, i) => (
-        <div
+        <img
           key={`${src}-${i}`}
-          className="absolute inset-0 transition-opacity duration-700 ease-in-out"
+          src={src}
+          alt=""
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out"
           style={{
+            objectPosition: HERO_OBJECT_POSITION,
             opacity: i === currentIndex ? 1 : 0,
-            backgroundImage: `url(${src})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
           }}
-          aria-hidden={i !== currentIndex}
         />
       ))}
     </div>

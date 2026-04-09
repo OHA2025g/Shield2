@@ -142,11 +142,13 @@ const Homepage = () => {
     <div className="min-h-screen bg-white overflow-x-hidden">
       <Header />
       
-      {/* Hero Section with NGO imagery carousel (always an image, never grey) */}
+      {/* Hero: taller viewport-relative min-height so cover crops less from top/bottom of photos */}
       <section
-        className="relative py-20 overflow-hidden min-h-[420px] flex items-center bg-cover bg-center"
+        className="relative flex min-h-[min(78vh,720px)] items-center overflow-hidden bg-slate-900 py-16 sm:min-h-[min(82vh,800px)] sm:py-20 md:min-h-[min(85vh,860px)] md:py-24"
         style={{
           backgroundImage: `url(https://images.unsplash.com/photo-1523240795612-9a1b7227348e?w=1920&h=1080&fit=crop)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 28%',
         }}
       >
         <HeroBackgroundCarousel />
