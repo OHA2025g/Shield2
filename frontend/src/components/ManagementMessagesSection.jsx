@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getManagementMessages } from '../api';
 import { Card, CardContent } from './ui/card';
 import { Quote } from 'lucide-react';
+import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 
 /** Shown when CMS has no active leadership messages (replace via Admin → Extra Content). */
 const DEFAULT_LEADER_MESSAGES = [
@@ -78,7 +80,29 @@ const ManagementMessagesSection = () => {
                   </div>
                 )}
                 {m.title && <h3 className="text-lg font-semibold text-gray-900 mb-2">{m.title}</h3>}
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line flex-1">{m.message}</p>
+                <div className="flex-1 min-h-[180px]">
+                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line line-clamp-10">{m.message}</p>
+                </div>
+                {String(m.message || '').trim().length > 320 && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button type="button" variant="outline" size="sm" className="mt-3 self-start">
+                        Read full message
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>{m.title || 'Message from leaders'}</DialogTitle>
+                        <DialogDescription>
+                          {m.author_name ? m.author_name : ''}{m.author_role ? ` — ${m.author_role}` : ''}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="max-h-[70vh] overflow-auto pr-1">
+                        <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">{m.message}</p>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
                 <div className="mt-4 pt-4 border-t border-slate-100">
                   {m.author_name && <p className="font-medium text-gray-900 text-sm">{m.author_name}</p>}
                   {m.author_role && <p className="text-xs text-blue-700">{m.author_role}</p>}

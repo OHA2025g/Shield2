@@ -923,13 +923,58 @@ const ExtraContentManagement = () => {
                   <Input placeholder="Image URL (optional)" value={quoteForm.image_url} onChange={(e) => setQuoteForm((p) => ({ ...p, image_url: e.target.value }))} />
                   <ImageQualityHint context="carousel" className="mt-1" />
                 </div>
-                <Input type="date" value={quoteForm.quote_date} onChange={(e) => setQuoteForm((p) => ({ ...p, quote_date: e.target.value }))} />
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <div className="space-y-1">
+                    <Label>Language</Label>
+                    <select
+                      className={nativeSelectClass}
+                      value={quoteForm.language}
+                      onChange={(e) => setQuoteForm((p) => ({ ...p, language: e.target.value }))}
+                    >
+                      <option value="en">English (en)</option>
+                      <option value="mr">मराठी (mr)</option>
+                      <option value="hi">हिन्दी (hi)</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Quote date</Label>
+                    <Input type="date" value={quoteForm.quote_date} onChange={(e) => setQuoteForm((p) => ({ ...p, quote_date: e.target.value }))} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Order</Label>
+                    <Input
+                      type="number"
+                      value={quoteForm.order}
+                      onChange={(e) => setQuoteForm((p) => ({ ...p, order: Number(e.target.value || 0) }))}
+                    />
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={quoteForm.is_active !== false}
+                    onChange={(e) => setQuoteForm((p) => ({ ...p, is_active: e.target.checked }))}
+                  />
+                  Active
+                </label>
                 <Button type="submit"><Save className="h-4 w-4 mr-2" /> {editingQuote ? 'Update' : 'Add'}</Button>
               </form>
               <ul className="space-y-2">
                 {dailyQuotes.map((q) => (
                   <li key={q.id} className={cn(adminRecordRowClass, 'items-center')}>
-                    <span className="line-clamp-2 min-w-0 flex-1 text-sm text-foreground">{q.quote}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="line-clamp-2 text-sm text-foreground">{q.quote}</span>
+                        <span className="text-[11px] text-muted-foreground rounded border px-1.5 py-0.5">
+                          {(q.language || 'en').toLowerCase()}
+                        </span>
+                        {q.quote_date && (
+                          <span className="text-[11px] text-muted-foreground rounded border px-1.5 py-0.5">
+                            {q.quote_date}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <div className="flex shrink-0 gap-0.5">
                       <Button size="sm" variant="ghost" onClick={() => { setEditingQuote(q); setQuoteForm({ quote: q.quote, author: q.author || '', image_url: q.image_url || '', language: q.language || 'en', quote_date: q.quote_date || '', order: q.order || 0, is_active: q.is_active !== false }); }}><Edit className="h-4 w-4" /></Button>
                       <Button size="sm" variant="ghost" onClick={() => deleteQuote(q.id)}><Trash2 className="h-4 w-4 text-red-600" /></Button>
