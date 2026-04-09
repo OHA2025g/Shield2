@@ -65,45 +65,50 @@ const ManagementMessagesSection = () => {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {displayMessages.map((m) => (
-            <Card key={m.id} className="border border-slate-200 shadow-sm overflow-hidden">
-              <CardContent className="p-6 flex flex-col h-full">
+            <Card
+              key={m.id}
+              className="flex h-[26rem] sm:h-[27rem] flex-col border border-slate-200 shadow-sm overflow-hidden"
+            >
+              <CardContent className="flex flex-1 min-h-0 flex-col p-6">
                 {m.image && (
-                  <div className="mb-4 flex justify-center">
+                  <div className="mb-3 flex shrink-0 justify-center">
                     <img
                       src={m.image}
                       alt=""
-                      className="h-20 w-20 rounded-full object-cover border-2 border-blue-100"
+                      className="h-16 w-16 rounded-full object-cover border-2 border-blue-100"
                       onError={(e) => {
                         e.target.style.display = 'none';
                       }}
                     />
                   </div>
                 )}
-                {m.title && <h3 className="text-lg font-semibold text-gray-900 mb-2">{m.title}</h3>}
-                <div className="flex-1 min-h-[180px]">
-                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line line-clamp-10">{m.message}</p>
+                {m.title && <h3 className="shrink-0 text-lg font-semibold text-gray-900 mb-2">{m.title}</h3>}
+                <div
+                  className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain rounded-md border border-slate-100/80 bg-slate-50/50 px-3 py-2 [scrollbar-width:thin]"
+                  tabIndex={0}
+                  aria-label="Message preview, scroll to read more"
+                >
+                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{m.message}</p>
                 </div>
-                {String(m.message || '').trim().length > 320 && (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button type="button" variant="outline" size="sm" className="mt-3 self-start">
-                        Read full message
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle>{m.title || 'Message from leaders'}</DialogTitle>
-                        <DialogDescription>
-                          {m.author_name ? m.author_name : ''}{m.author_role ? ` — ${m.author_role}` : ''}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="max-h-[70vh] overflow-auto pr-1">
-                        <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">{m.message}</p>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
-                <div className="mt-4 pt-4 border-t border-slate-100">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm" className="mt-3 shrink-0 self-start">
+                      Read full message
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>{m.title || 'Message from leaders'}</DialogTitle>
+                      <DialogDescription>
+                        {m.author_name ? m.author_name : ''}{m.author_role ? ` — ${m.author_role}` : ''}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="max-h-[70vh] overflow-auto pr-1">
+                      <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">{m.message}</p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                <div className="mt-auto shrink-0 pt-3 border-t border-slate-100">
                   {m.author_name && <p className="font-medium text-gray-900 text-sm">{m.author_name}</p>}
                   {m.author_role && <p className="text-xs text-blue-700">{m.author_role}</p>}
                 </div>

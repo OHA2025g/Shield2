@@ -212,43 +212,59 @@ const Gallery = () => {
       {/* Gallery Grid */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             {filteredItems.map((item) => (
-              <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <div className="relative group">
+              <Card
+                key={item.id}
+                className="flex h-[28rem] sm:h-[29rem] flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              >
+                <div className="relative group h-40 sm:h-44 shrink-0">
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   {item.type === 'video' && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-10 transition-all duration-300">
                       <Play className="h-16 w-16 text-white" />
                     </div>
                   )}
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute top-3 left-3">
                     <Badge className="bg-blue-600 text-white">
                       {item.category === 'youth' && <Users className="h-3 w-3 mr-1" />}
                       {item.category === 'seniors' && <Heart className="h-3 w-3 mr-1" />}
                       {item.category === 'events' && <Award className="h-3 w-3 mr-1" />}
                       {item.category === 'community' && <Users className="h-3 w-3 mr-1" />}
-                      {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                      {item.category === 'case_study' && <Heart className="h-3 w-3 mr-1" />}
+                      {typeof item.category === 'string' && item.category.length > 0
+                        ? item.category === 'case_study'
+                          ? 'Case study'
+                          : item.category.charAt(0).toUpperCase() + item.category.slice(1).replace('_', ' ')
+                        : ''}
                     </Badge>
                   </div>
                 </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-600 mb-4">{item.description}</p>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(item.date).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
+                <CardContent className="flex flex-1 min-h-0 flex-col p-4">
+                  <h3 className="shrink-0 text-lg font-semibold text-gray-900 mb-2 leading-snug line-clamp-2">{item.title}</h3>
+                  <div
+                    className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain rounded-md border border-slate-100 bg-slate-50/40 px-3 py-2 mb-3 text-sm [scrollbar-width:thin]"
+                    tabIndex={0}
+                    aria-label={`Description for ${item.title}. Scroll to read more.`}
+                  >
+                    <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                  </div>
+                  <div className="mt-auto flex shrink-0 items-center justify-between gap-2 text-sm text-gray-500 pt-2 border-t border-slate-100">
+                    <div className="flex min-w-0 items-center">
+                      <Calendar className="h-4 w-4 mr-1 shrink-0" />
+                      <span className="truncate">
+                        {new Date(item.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </span>
                     </div>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="shrink-0">
                       {item.type?.charAt(0).toUpperCase() + item.type?.slice(1) || 'Image'}
                     </Badge>
                   </div>
