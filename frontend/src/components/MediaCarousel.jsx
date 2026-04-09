@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { getGalleryItems } from '../api';
 import { Button } from './ui/button';
 
-const MediaCarousel = ({ categoryFilter = null, title = "Gallery", autoScrollInterval = 5000 }) => {
+const MediaCarousel = ({ categoryFilter = null, title = "Gallery", autoScrollInterval = 5000, embedded = false }) => {
   const [items, setItems] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -51,13 +51,12 @@ const MediaCarousel = ({ categoryFilter = null, title = "Gallery", autoScrollInt
   const showImage = item.type !== 'video' && item.image && item.image.trim();
   const usePlaceholder = imageError || !showImage;
 
-  return (
-    <section className="py-6 bg-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {title && (
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">{title}</h2>
-        )}
-        <div className="relative rounded-lg overflow-hidden shadow-lg bg-white border border-gray-200">
+  const inner = (
+    <>
+      {title && !embedded && (
+        <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">{title}</h2>
+      )}
+      <div className="relative overflow-hidden rounded-xl border border-gray-200/90 bg-gray-950 shadow-sm ring-1 ring-black/5">
           {item.type === 'video' && item.video_url ? (
             <div className="aspect-video bg-black">
               {item.video_url.includes('youtube.com') || item.video_url.includes('youtu.be') ? (
@@ -117,7 +116,16 @@ const MediaCarousel = ({ categoryFilter = null, title = "Gallery", autoScrollInt
             </>
           )}
         </div>
-      </div>
+    </>
+  );
+
+  if (embedded) {
+    return <div className="w-full">{inner}</div>;
+  }
+
+  return (
+    <section className="py-6 bg-white">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">{inner}</div>
     </section>
   );
 };
