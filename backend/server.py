@@ -1966,7 +1966,7 @@ async def get_daily_quote_groups():
                     "order": g.get("order", 0),
                 }
             )
-        return {"groups": groups, "rotate_interval_seconds": 8}
+        return {"groups": groups, "rotate_interval_seconds": 120}
     except Exception as e:
         logger.error(f"Failed to fetch daily quote groups: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch daily quote groups")

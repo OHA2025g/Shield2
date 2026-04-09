@@ -36,7 +36,7 @@ function pickAuthorText(group, lang) {
 
 const DailyQuoteSection = () => {
   const [groups, setGroups] = useState([]);
-  const [rotateSeconds, setRotateSeconds] = useState(8);
+  const [rotateSeconds, setRotateSeconds] = useState(120);
   const [index, setIndex] = useState(0);
   const [language, setLanguage] = useState(() => {
     try {
@@ -46,7 +46,6 @@ const DailyQuoteSection = () => {
     }
   });
   const [loading, setLoading] = useState(true);
-  const [paused, setPaused] = useState(false);
 
   const loadGroups = useCallback(() => {
     setLoading(true);
@@ -54,7 +53,7 @@ const DailyQuoteSection = () => {
       .then((data) => {
         const g = data?.groups || [];
         setGroups(g);
-        setRotateSeconds(Number(data?.rotate_interval_seconds) > 0 ? Number(data.rotate_interval_seconds) : 8);
+        setRotateSeconds(Number(data?.rotate_interval_seconds) > 0 ? Number(data.rotate_interval_seconds) : 120);
         setIndex(0);
       })
       .catch(() => {
@@ -74,13 +73,13 @@ const DailyQuoteSection = () => {
   const authorText = useMemo(() => (current ? pickAuthorText(current, language) : ''), [current, language]);
 
   useEffect(() => {
-    if (total <= 1 || paused) return undefined;
-    const ms = Math.max(3, rotateSeconds) * 1000;
+    if (total <= 1) return undefined;
+    const ms = Math.max(10, rotateSeconds) * 1000;
     const t = setInterval(() => {
       setIndex((i) => (i + 1) % total);
     }, ms);
     return () => clearInterval(t);
-  }, [total, rotateSeconds, paused]);
+  }, [total, rotateSeconds]);
 
   const selectLang = (code) => {
     setLanguage(code);
@@ -91,17 +90,10 @@ const DailyQuoteSection = () => {
     }
   };
 
-  const goTo = (i) => setIndex(((i % total) + total) % total);
-
   if (!loading && (!total || !quoteText)) return null;
 
   return (
-    <section
-      className="relative w-full py-8 overflow-hidden"
-      aria-label="Quote of the day"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
+    <section className="relative w-full py-8 overflow-hidden" aria-label="Quote of the day">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/95 via-indigo-700/95 to-blue-800/95" aria-hidden="true" />
       <div
         className="absolute inset-0 opacity-30"
@@ -161,49 +153,6 @@ const DailyQuoteSection = () => {
                 </div>
               )}
             </div>
-
-            {total > 1 && (
-              <div className="mt-6 flex flex-col items-center gap-3">
-                <p className="text-[11px] text-white/70">
-                  {index + 1} / {total} · rotates every {rotateSeconds}s {paused ? '(paused)' : ''}
-                </p>
-                <div className="flex flex-wrap justify-center gap-1.5" role="tablist" aria-label="Quote slides">
-                  {groups.map((g, i) => (
-                    <button
-                      key={g.id || i}
-                      type="button"
-                      aria-label={`Show quote ${i + 1}`}
-                      aria-current={i === index ? 'true' : undefined}
-                      className={cn(
-                        'h-2.5 w-2.5 rounded-full transition-colors',
-                        i === index ? 'bg-yellow-300' : 'bg-white/35 hover:bg-white/55'
-                      )}
-                      onClick={() => goTo(i)}
-                    />
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="text-white/90 hover:bg-white/10 h-8"
-                    onClick={() => goTo(index - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="text-white/90 hover:bg-white/10 h-8"
-                    onClick={() => goTo(index + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from './ui/carousel';
 import { Heart, Users, Award, Target, Eye, Star, CheckCircle, Calendar, Building } from 'lucide-react';
 import { api, getPublicSiteContent, getLeadershipTeam, getDetailedPageSections, getManagementMessages } from '../api';
@@ -43,7 +42,6 @@ function findManagementMessageForMember(member, messages) {
 }
 
 const About = () => {
-  const location = useLocation();
   // Site content state
   const [siteContent, setSiteContent] = useState({});
   // Leadership team state
@@ -154,15 +152,6 @@ const About = () => {
     
     loadData();
   }, []);
-
-  useEffect(() => {
-    const raw = (location.hash || '').replace(/^#/, '');
-    if (!raw) return undefined;
-    const t = setTimeout(() => {
-      document.getElementById(raw)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 200);
-    return () => clearTimeout(t);
-  }, [location.hash, managementMessages]);
 
   const values = [
     {
@@ -380,9 +369,30 @@ const About = () => {
                               <p className="text-gray-600 text-sm leading-relaxed flex-1">{member.description}</p>
                             )}
                             {linkedMessage && (
-                              <Button asChild variant="outline" size="sm" className="mt-4 w-full shrink-0 text-xs sm:text-sm">
-                                <Link to={`/about#leader-msg-${linkedMessage.id}`}>Read their message</Link>
-                              </Button>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className="mt-4 w-full shrink-0 border-0 bg-transparent p-0 text-center text-sm font-medium text-slate-400 underline-offset-4 transition-colors hover:text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
+                                  >
+                                    Read their message<span aria-hidden="true"> →</span>
+                                  </button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-lg sm:max-w-xl max-h-[min(85vh,640px)] flex flex-col gap-0 p-0 sm:rounded-xl overflow-hidden">
+                                  <DialogHeader className="space-y-1 border-b border-border/60 bg-muted/30 px-6 py-4 text-left">
+                                    <DialogTitle className="text-lg leading-snug pr-8">
+                                      {linkedMessage.title || 'Message from leadership'}
+                                    </DialogTitle>
+                                    <DialogDescription className="text-sm">
+                                      {[linkedMessage.author_name, linkedMessage.author_role].filter(Boolean).join(' — ') ||
+                                        member.name}
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4 text-sm leading-relaxed text-foreground whitespace-pre-line">
+                                    {linkedMessage.message}
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
                             )}
                           </CardContent>
                         </Card>
@@ -402,37 +412,6 @@ const About = () => {
           )}
         </div>
       </section>
-
-      {managementMessages.length > 0 && (
-        <section className="py-16 bg-slate-50 border-t border-slate-200" aria-labelledby="leadership-messages-heading">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 id="leadership-messages-heading" className="text-3xl font-bold text-gray-900 mb-3 text-center">
-              Messages from leadership
-            </h2>
-            <p className="text-center text-gray-600 text-sm max-w-2xl mx-auto mb-10">
-              Reflections from our team. From a profile above, use &quot;Read their message&quot; to jump to the right note.
-            </p>
-            <div className="space-y-8 max-w-3xl mx-auto">
-              {managementMessages.map((m) => (
-                <article
-                  key={m.id}
-                  id={`leader-msg-${m.id}`}
-                  className="scroll-mt-28 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-                >
-                  {m.title && <h3 className="text-xl font-semibold text-gray-900 mb-2">{m.title}</h3>}
-                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{m.message}</p>
-                  {(m.author_name || m.author_role) && (
-                    <footer className="mt-4 pt-4 border-t border-slate-100">
-                      {m.author_name && <p className="font-medium text-gray-900 text-sm">{m.author_name}</p>}
-                      {m.author_role && <p className="text-xs text-blue-700">{m.author_role}</p>}
-                    </footer>
-                  )}
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Dynamic Page Sections */}
       {pageSections.length > 0 && (
