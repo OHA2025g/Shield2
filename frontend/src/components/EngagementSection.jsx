@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { resolvePublicAssetUrl } from '../utils/assetUrl';
 import { Button } from './ui/button';
 import { Heart, Book, DollarSign, Briefcase, ChevronDown } from 'lucide-react';
 import { getEngagementOptions } from '../api';
@@ -103,7 +104,11 @@ const EngagementSection = () => {
             <p className="text-sm text-gray-600 mb-2 flex-1 min-h-0">{options.monetary_payment_options || 'QR code and digital payment options available.'}</p>
             <div className="mt-auto pt-2 flex flex-col gap-2">
               <img
-                src={options.monetary_qr_image_url || 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=Donate%20to%20SHIELD%20Foundation%20-%20https%3A%2F%2Fshieldfoundation.org%2Fdonate'}
+                src={
+                  options.monetary_qr_image_url
+                    ? resolvePublicAssetUrl(options.monetary_qr_image_url)
+                    : 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=Donate%20to%20SHIELD%20Foundation%20-%20https%3A%2F%2Fshieldfoundation.org%2Fdonate'
+                }
                 alt="Donation QR"
                 className="h-20 w-20 object-contain border border-gray-200 rounded self-start"
               />

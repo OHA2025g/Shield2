@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getGalleryItems } from '../api';
+import { isUsableMediaUrl, resolvePublicAssetUrl } from '../utils/assetUrl';
 
 const HERO_GALLERY_CATEGORY = 'homepage_hero';
 
@@ -40,10 +41,10 @@ const HeroBackgroundCarousel = () => {
           .filter((item) => {
             if (item.type && item.type !== 'image') return false;
             const img = item.image && String(item.image).trim();
-            return img && img.length > 10 && (img.startsWith('http://') || img.startsWith('https://'));
+            return isUsableMediaUrl(img);
           })
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-          .map((item) => item.image)
+          .map((item) => resolvePublicAssetUrl(item.image))
           .filter(Boolean);
         if (urls.length >= 1) {
           setImages(urls);
@@ -56,8 +57,8 @@ const HeroBackgroundCarousel = () => {
     };
   }, []);
 
-  const safeImages = (images.length > 0 ? images : FALLBACK_IMAGES).filter(
-    (src) => src && String(src).trim() && (src.startsWith('http://') || src.startsWith('https://'))
+  const safeImages = (images.length > 0 ? images : FALLBACK_IMAGES).filter((src) =>
+    isUsableMediaUrl(src)
   );
   const displayImages = safeImages.length > 0 ? safeImages : FALLBACK_IMAGES;
   const len = displayImages.length;

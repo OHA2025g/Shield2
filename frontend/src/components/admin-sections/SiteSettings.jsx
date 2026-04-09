@@ -488,8 +488,10 @@ const SiteSettings = ({
             <div className="p-3 bg-yellow-50 rounded-lg">
               <h4 className="font-medium text-yellow-900 mb-1">Image Hosting</h4>
               <p className="text-yellow-700">
-                Host your images on reliable services like Imgur, Cloudinary, or your own CDN. 
-                Make sure URLs are publicly accessible and use HTTPS.
+                You can use full HTTPS links (Imgur, Cloudinary, etc.) or same-site paths such as{' '}
+                <code className="rounded bg-yellow-100/80 px-1 text-xs">/images/photo.jpg</code> and{' '}
+                <code className="rounded bg-yellow-100/80 px-1 text-xs">/files/document.pdf</code> when those
+                files are on your server (e.g. Easypanel volume under the site static folders).
               </p>
             </div>
           </div>

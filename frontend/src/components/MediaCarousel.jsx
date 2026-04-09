@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { getGalleryItems } from '../api';
 import { Button } from './ui/button';
 import { cn, looksLikeGibberishText } from '../lib/utils';
+import { isUsableMediaUrl, resolvePublicAssetUrl } from '../utils/assetUrl';
 
 const MediaCarousel = ({ categoryFilter = null, title = 'Gallery', autoScrollInterval = 5000, embedded = false }) => {
   const [items, setItems] = useState([]);
@@ -129,7 +130,7 @@ const MediaCarousel = ({ categoryFilter = null, title = 'Gallery', autoScrollInt
           ) : (
             <div className="aspect-video w-full overflow-hidden bg-black">
               <img
-                src={item.image}
+                src={resolvePublicAssetUrl(item.image)}
                 alt={item.title || 'Event'}
                 className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/car:scale-[1.03]"
                 onError={() => setImageError(true)}
@@ -137,10 +138,10 @@ const MediaCarousel = ({ categoryFilter = null, title = 'Gallery', autoScrollInt
             </div>
           )}
 
-          {item.badge_image && String(item.badge_image).trim().startsWith('http') && (
+          {item.badge_image && isUsableMediaUrl(item.badge_image) && (
             <div className="absolute left-3 top-3 z-10 h-9 w-9 overflow-hidden rounded-md border border-white/30 bg-black/40 shadow-md">
               <img
-                src={item.badge_image}
+                src={resolvePublicAssetUrl(item.badge_image)}
                 alt=""
                 className="h-full w-full object-cover"
                 onError={(e) => {

@@ -63,6 +63,7 @@ async def init_database():
         await db.career_applications.create_index([("created_at", -1)])
         await db.course_enquiries.create_index([("created_at", -1)])
         await db.content_submissions.create_index([("status", 1), ("created_at", -1)])
+        await db.daily_quote_groups.create_index([("is_active", 1), ("order", 1)])
         
         logger.info("Database initialization completed")
         
