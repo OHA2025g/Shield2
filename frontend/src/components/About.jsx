@@ -202,7 +202,7 @@ const About = () => {
       {/* Our Story */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-8 items-start md:gap-12">
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">
                 {siteContent.about?.story?.title || "Our Story"}
@@ -213,12 +213,12 @@ const About = () => {
                 can live with dignity till the end of life irrespective of socio-economic status."`}
               </div>
             </div>
-            <div className="relative mx-auto w-full max-w-md">
-              <div className="overflow-hidden rounded-xl shadow-lg">
+            <div className="relative mx-auto w-full max-w-[280px] sm:max-w-xs">
+              <div className="max-h-[300px] overflow-hidden rounded-xl shadow-lg sm:max-h-[340px]">
                 <img
                   src={siteContent.about?.story?.image || '/images/swati-photo.jpeg'}
                   alt="Mrs. Swati Ingole, Founder of Shield Foundation"
-                  className="block h-auto w-full"
+                  className="block h-full w-full object-cover object-top"
                 />
               </div>
               <div className="absolute -bottom-4 -left-4 bg-blue-600 text-white p-5 rounded-lg shadow-md sm:-bottom-6 sm:-left-6 sm:p-6">
