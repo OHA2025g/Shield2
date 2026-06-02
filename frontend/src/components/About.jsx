@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from './ui/carousel';
-import { Heart, Users, Award, Target, Eye, Star, CheckCircle, Calendar, Building } from 'lucide-react';
+import { Heart, Users, Award, Target, Eye, Star, CheckCircle, Calendar, Building, Sun, HandHeart } from 'lucide-react';
 import { api, getPublicSiteContent, getLeadershipTeam, getDetailedPageSections, getManagementMessages } from '../api';
 import Header from './Header';
 import Footer from './Footer';
@@ -200,33 +200,62 @@ const About = () => {
       </section>
 
       {/* Our Story */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 items-center md:gap-10">
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                {siteContent.about?.story?.title || "Our Story"}
+      <section className="relative overflow-hidden bg-gradient-to-br from-amber-50/90 via-stone-50 to-yellow-50/80 py-14 md:py-16">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40"
+          aria-hidden
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 20% 30%, rgba(251, 191, 36, 0.15) 0%, transparent 45%), radial-gradient(circle at 85% 70%, rgba(180, 83, 9, 0.08) 0%, transparent 50%)',
+          }}
+        />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-10 md:grid-cols-2 md:gap-12 lg:gap-16">
+            <div className="md:pr-4">
+              <h2 className="mb-5 font-serif text-4xl font-semibold tracking-tight text-amber-950 md:text-5xl">
+                {siteContent.about?.story?.title || 'Our Story'}
               </h2>
-              <div className="text-lg text-gray-600 mb-6 leading-relaxed">
-                {siteContent.about?.story?.content || `Shield Foundation was founded by Mrs. Swati Ingole with a clear mission: "To add life to years – 
+              <p className="text-lg leading-relaxed text-stone-700">
+                {siteContent.about?.story?.content ||
+                  `Shield Foundation was founded by Mrs. Swati Ingole with a clear mission: "To add life to years – 
                 equipping and empowering communities so that every individual, especially the elderly and vulnerable, 
                 can live with dignity till the end of life irrespective of socio-economic status."`}
-              </div>
+              </p>
             </div>
-            <div className="relative w-full md:max-w-lg md:justify-self-end">
-              <div className="overflow-hidden rounded-xl shadow-lg ring-1 ring-black/5">
-                <img
-                  src={siteContent.about?.story?.image || '/images/swati-photo.png'}
-                  alt="Mrs. Swati Ingole, Founder of Shield Foundation"
-                  className="block h-auto max-h-[min(520px,70vh)] w-full object-contain"
-                />
+
+            <div className="relative mx-auto flex w-full max-w-md justify-center md:mx-0 md:max-w-lg md:justify-end">
+              <div
+                className="absolute -left-1 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-5 text-amber-800/60 md:flex lg:-left-6"
+                aria-hidden
+              >
+                <HandHeart className="h-9 w-9 stroke-[1.25]" />
+                <Sun className="h-9 w-9 stroke-[1.25]" />
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-blue-600 text-white p-5 rounded-lg shadow-md sm:-bottom-6 sm:-left-6 sm:p-6">
-                <div className="text-2xl font-bold">
-                  {siteContent.about?.story?.highlightBox?.text || "6+ Years"}
+
+              <div className="relative w-full">
+                <div className="rounded-[1.75rem] bg-gradient-to-br from-amber-400 via-amber-500 to-amber-800 p-[3px] shadow-[0_20px_50px_-12px_rgba(180,83,9,0.35)]">
+                  <div className="overflow-hidden rounded-[1.6rem] bg-stone-100">
+                    <img
+                      src={siteContent.about?.story?.image || '/images/swati-photo.png'}
+                      alt="Mrs. Swati Ingole, Founder of Shield Foundation"
+                      className="block h-auto max-h-[min(460px,62vh)] w-full object-contain"
+                    />
+                  </div>
                 </div>
-                <div className="text-sm">
-                  {siteContent.about?.story?.highlightBox?.subtext || "Serving Communities"}
+
+                <div
+                  className="absolute -bottom-4 -left-3 z-20 flex h-[7.25rem] w-[7.25rem] flex-col items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 p-3 text-center shadow-lg ring-4 ring-amber-50/90 sm:-bottom-5 sm:-left-5 sm:h-32 sm:w-32"
+                  role="presentation"
+                >
+                  <span className="font-serif text-xl font-bold leading-none text-amber-950 sm:text-2xl">
+                    {siteContent.about?.story?.highlightBox?.text || '16+'}
+                  </span>
+                  <span className="mt-0.5 text-[9px] font-semibold uppercase leading-tight tracking-wide text-amber-950/90 sm:text-[10px]">
+                    Years
+                  </span>
+                  <span className="mt-1 max-w-[5.5rem] text-[8px] font-medium uppercase leading-snug tracking-wide text-amber-950/85 sm:text-[9px]">
+                    {siteContent.about?.story?.highlightBox?.subtext || 'Serving Communities'}
+                  </span>
                 </div>
               </div>
             </div>
