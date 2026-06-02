@@ -213,32 +213,13 @@ const About = () => {
                 can live with dignity till the end of life irrespective of socio-economic status."`}
               </div>
             </div>
-            <div className="relative">
-              <div className="relative rounded-lg shadow-lg overflow-hidden bg-gradient-to-r from-blue-50 via-[#b0b0b0] to-yellow-50">
-                <div className="relative flex min-h-[280px] items-center justify-center px-2 py-3 sm:min-h-[320px]">
-                  <img
-                    src={siteContent.about?.story?.image || '/images/swati-photo.jpeg'}
-                    alt="Mrs. Swati Ingole, Founder of Shield Foundation"
-                    className="relative z-[1] max-h-[340px] w-auto max-w-full object-contain sm:max-h-[380px]"
-                  />
-                  <div
-                    className="pointer-events-none absolute inset-0 z-[2]"
-                    aria-hidden
-                    style={{
-                      background: `linear-gradient(
-                        to right,
-                        rgb(239 246 255) 0%,
-                        rgba(239, 246, 255, 0.92) 6%,
-                        rgba(239, 246, 255, 0.45) 14%,
-                        transparent 28%,
-                        transparent 72%,
-                        rgba(254, 252, 232, 0.45) 86%,
-                        rgba(254, 252, 232, 0.92) 94%,
-                        rgb(254 252 232) 100%
-                      )`,
-                    }}
-                  />
-                </div>
+            <div className="relative mx-auto w-full max-w-sm md:max-w-md">
+              <div className="relative aspect-[2/3] overflow-hidden rounded-lg shadow-lg bg-gradient-to-br from-blue-50 to-yellow-50">
+                <img
+                  src={siteContent.about?.story?.image || '/images/swati-photo.jpeg'}
+                  alt="Mrs. Swati Ingole, Founder of Shield Foundation"
+                  className="h-full w-full object-cover object-top"
+                />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-6 rounded-lg">
                 <div className="text-2xl font-bold">
