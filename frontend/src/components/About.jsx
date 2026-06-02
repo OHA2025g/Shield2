@@ -214,11 +214,13 @@ const About = () => {
               </div>
             </div>
             <div className="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop"
-                alt="Shield Foundation Community Work"
-                className="rounded-lg shadow-lg"
-              />
+              <div className="rounded-lg shadow-lg overflow-hidden bg-gradient-to-br from-blue-50 to-yellow-50">
+                <img
+                  src={siteContent.about?.story?.image || '/images/swati-photo.jpeg'}
+                  alt="Mrs. Swati Ingole, Founder of Shield Foundation"
+                  className="w-full aspect-[3/2] object-contain"
+                />
+              </div>
               <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-6 rounded-lg">
                 <div className="text-2xl font-bold">
                   {siteContent.about?.story?.highlightBox?.text || "6+ Years"}
