@@ -213,15 +213,15 @@ const About = () => {
                 can live with dignity till the end of life irrespective of socio-economic status."`}
               </div>
             </div>
-            <div className="relative mx-auto w-full max-w-sm md:max-w-md">
-              <div className="relative aspect-[2/3] overflow-hidden rounded-lg shadow-lg bg-gradient-to-br from-blue-50 to-yellow-50">
+            <div className="relative mx-auto w-full max-w-md">
+              <div className="overflow-hidden rounded-xl shadow-lg">
                 <img
                   src={siteContent.about?.story?.image || '/images/swati-photo.jpeg'}
                   alt="Mrs. Swati Ingole, Founder of Shield Foundation"
-                  className="h-full w-full object-cover object-top"
+                  className="block h-auto w-full"
                 />
               </div>
-              <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-6 rounded-lg">
+              <div className="absolute -bottom-4 -left-4 bg-blue-600 text-white p-5 rounded-lg shadow-md sm:-bottom-6 sm:-left-6 sm:p-6">
                 <div className="text-2xl font-bold">
                   {siteContent.about?.story?.highlightBox?.text || "6+ Years"}
                 </div>
