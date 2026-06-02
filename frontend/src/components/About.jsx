@@ -223,7 +223,7 @@ const About = () => {
               </p>
             </div>
 
-            <div className="relative mx-auto flex w-full max-w-xl justify-center md:mx-0 md:max-w-2xl md:justify-end">
+            <div className="relative mx-auto flex w-full max-w-md justify-center md:mx-0 md:max-w-lg md:justify-end">
               <div
                 className="absolute -left-1 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-5 text-amber-800/60 md:flex lg:-left-6"
                 aria-hidden
@@ -238,7 +238,7 @@ const About = () => {
                     <img
                       src={siteContent.about?.story?.image || '/images/swati-photo.png'}
                       alt="Mrs. Swati Ingole, Founder of Shield Foundation"
-                      className="block h-auto max-h-[min(520px,68vh)] w-full object-contain"
+                      className="block h-auto max-h-[min(460px,62vh)] w-full object-contain"
                     />
                   </div>
                 </div>
